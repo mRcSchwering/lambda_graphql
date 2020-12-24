@@ -1,0 +1,71 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Transform: AWS::Serverless-2016-10-31
+Description: >
+  lambda_graphql
+
+  GraphQL endpoint in Lambda function
+
+Parameters:
+  Stage:
+    Type: String
+    Default: dev
+
+Globals:
+  Function:
+    Timeout: 5
+  Api:
+    Cors:
+      AllowMethods: "'OPTIONS'"
+      AllowHeaders: "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'"
+      AllowOrigin: "'*'"
+
+Resources:
+  LambdaGraphqlGetFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: src/
+      Handler: graphql_get.lambda_handler
+      Runtime: python3.8
+      Events:
+        LambdaGraphql:
+          Type: Api
+          Properties:
+            Path: /graphql
+            Method: get
+            RestApiId: !Ref ApiDeployment
+
+  LambdaGraphqlPostFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: src/
+      Handler: graphql_post.lambda_handler
+      Runtime: python3.8
+      Events:
+        LambdaGraphql:
+          Type: Api
+          Properties:
+            Path: /graphql
+            Method: post
+            RestApiId: !Ref ApiDeployment
+
+  ApiDeployment:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: !Ref Stage
+
+Outputs:
+  LambdaGraphqlApi:
+    Description: "API Gateway endpoint URL for the Lambda-GraphQL app"
+    Value: !Sub "https://${ApiDeployment}.execute-api.${AWS::Region}.amazonaws.com/${Stage}/graphql/"
+  LambdaGraphqlGetFunction:
+    Description: "Lambda-GraphQL GET Lambda Function ARN"
+    Value: !GetAtt LambdaGraphqlGetFunction.Arn
+  LambdaGraphqlGetFunctionIamRole:
+    Description: "Implicit IAM Role created for Lambda-GraphQL GET function"
+    Value: !GetAtt LambdaGraphqlGetFunctionRole.Arn
+  LambdaGraphqlPostFunction:
+    Description: "Lambda-GraphQL POST Lambda Function ARN"
+    Value: !GetAtt LambdaGraphqlPostFunction.Arn
+  LambdaGraphqlPostFunctionIamRole:
+    Description: "Implicit IAM Role created for Lambda-GraphQL POST function"
+    Value: !GetAtt LambdaGraphqlPostFunctionRole.Arn
