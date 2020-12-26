@@ -1,55 +1,13 @@
-import json
-from ariadne import QueryType, gql, make_executable_schema, graphql_sync  # type: ignore
-
-type_defs = gql(
-    """
-    type Query {
-        hello: String!
-    }
 """
-)
-
-query = QueryType()
-
-
-@query.field("hello")
-def resolve_hello(_, info):
-    user_agent = "a user agent"
-    return "Hello, %s!" % user_agent
+GraphQL POST entrypoint
+"""
+from ariadne import graphql_sync  # type: ignore
+from src.handler import Event, Context, form_output
+from src.schema import schema
 
 
-schema = make_executable_schema(type_defs, query)
-
-
-def lambda_handler(event, context):
-    """Sample pure Lambda function
-
-    Parameters
-    ----------
-    event: dict, required
-        API Gateway Lambda Proxy Input Format
-
-        Event doc: https://docs.aws.amazon.com/apigateway/latest/developerguide/set-up-lambda-proxy-integrations.html#api-gateway-simple-proxy-for-lambda-input-format
-
-    context: object, required
-        Lambda Context runtime methods and attributes
-
-        Context doc: https://docs.aws.amazon.com/lambda/latest/dg/python-context-object.html
-
-    Returns
-    ------
-    API Gateway Lambda Proxy Output Format: dict
-
-        Return doc: https://docs.aws.amazon.com/apigateway/latest/developerguide/set-up-lambda-proxy-integrations.html
-    """
-
-    # try:
-    #     ip = requests.get("http://checkip.amazonaws.com/")
-    # except requests.RequestException as e:
-    #     # Send some context about this error to Lambda Logs
-    #     print(e)
-    #     raise e
-    # # "location": ip.text.replace("\n", "")
-    data = {"query": "{ hello }"}
-    success, result = graphql_sync(schema=schema, data=data)
-    return {"statusCode": 200 if success else 400, "body": json.dumps(result)}
+def lambda_handler(event_dict: dict, _: Context):
+    event = Event(**event_dict)
+    print(event)
+    success, result = graphql_sync(schema=schema, data=event.body)
+    return form_output(status=200 if success else 400, body=result)
