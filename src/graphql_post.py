@@ -8,6 +8,5 @@ from src.schema import schema
 
 def lambda_handler(event_dict: dict, _: Context):
     event = Event(**event_dict)
-    print(event)
     success, result = graphql_sync(schema=schema, data=event.body)
     return form_output(status=200 if success else 400, body=result)

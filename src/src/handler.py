@@ -18,8 +18,8 @@ class Event:
         resource: str,
         path: str,
         httpMethod: str,
-        isBase64Encoded: bool,
         headers: dict,
+        isBase64Encoded: Optional[bool] = None,
         apiId: Optional[str] = None,
         protocol: Optional[str] = None,
         body: Optional[str] = None,
@@ -35,10 +35,10 @@ class Event:
         self.resource = resource
         self.path = path
         self.http_method = httpMethod
-        self.is_base64_encoded = isBase64Encoded
         self.resource_path = resourcePath
         self.headers = headers
 
+        self.is_base64_encoded = isBase64Encoded
         self.api_id = apiId
         self.protocol = protocol
 
@@ -61,7 +61,6 @@ class Event:
             "resource": self.resource,
             "path": self.path,
             "http_method": self.http_method,
-            "is_base64_encoded": self.is_base64_encoded,
             "resource_path": self.resource_path,
             "headers": self.headers,
             "body": self.body,
