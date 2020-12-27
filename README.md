@@ -77,3 +77,8 @@ There is a ASGI app in [helper/app.py](./helper/app.py) for easier GraphQL devel
 ```
 PYTHONPATH=./src uvicorn helper.app:app --reload
 ```
+
+## Delete
+
+Go to AWS CloudFormation and delete the entire stack.
+This should delete all resources (Lambda functions, API Gateways, roles, policies...).
